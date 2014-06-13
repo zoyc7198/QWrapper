@@ -51,6 +51,32 @@ public class Wrapper_gjdairsw001 implements QunarCrawler {
 			"GO");
 	
 
+	public static void main(String[] args) {
+
+		FlightSearchParam searchParam = new FlightSearchParam();
+		searchParam.setDep("AMS");
+		searchParam.setArr("JNB");
+		searchParam.setDepDate("2014-07-17");
+		searchParam.setTimeOut("60000");
+		searchParam.setToken("");
+		
+		String html = new  Wrapper_gjdairsw001().getHtml(searchParam);
+
+		ProcessResultInfo result = new ProcessResultInfo();
+		result = new  Wrapper_gjdairsw001().process(html,searchParam);
+		if(result.isRet() && result.getStatus().equals(Constants.SUCCESS))
+		{
+			List<OneWayFlightInfo> flightList = (List<OneWayFlightInfo>) result.getData();
+			for (OneWayFlightInfo in : flightList){
+				System.out.println("************" + in.getInfo().toString());
+				System.out.println("++++++++++++" + in.getDetail().toString());
+			}
+		}
+		else
+		{
+			System.out.println(result.getStatus());
+		}
+	}
 	@Override
 	public BookingResult getBookingInfo(FlightSearchParam arg0) {
 		String bookingUrlPre = "https://airnamibia.sita.aero/itd/itd";
@@ -168,8 +194,19 @@ public class Wrapper_gjdairsw001 implements QunarCrawler {
 				seg.setDepairport(StringUtils.substringBetween(flightString,"locD = \"","\""));
 				seg.setArrtime(StringUtils.substringBetween(flightString,"arrivedatetime = \"","\""));
 				seg.setArrairport(StringUtils.substringBetween(flightString,"locA = \"","\""));
-				seg.setDepDate(StringUtils.substringBetween(flightString,"departdayofweek = \"","\""));
-				seg.setArrDate(StringUtils.substringBetween(flightString,"arrivedayofweek = \"","\""));
+				String depdates=StringUtils.substringBetween(flightString,"departdayofweek = \"","\"");
+				depdates=depdates.replace("&nbsp", "");
+				String [] depdatess=depdates.split(";");
+				String day=depdatess[1];
+				String [] deps = arg1.getDepDate().split("-");
+				deps[2]=day;
+				seg.setDepDate(deps[0]+"-"+deps[1]+"-"+deps[2]);
+				String arrdeta=StringUtils.substringBetween(flightString,"arrivedayofweek = \"","\"");
+				arrdeta=arrdeta.replace("&nbsp", "");
+				String [] arrdetass=arrdeta.split(";");
+				String dayarr=arrdetass[1];
+				deps[2]=dayarr;
+				seg.setArrDate(deps[0]+"-"+deps[1]+"-"+deps[2]);
 				segs.add(seg);
 			}
 			String priceStr=StringUtils.substringBetween(html,"<a title=\"Rules and Restrictions\"","</a>");
