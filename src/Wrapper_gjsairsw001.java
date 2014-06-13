@@ -51,6 +51,7 @@ public class Wrapper_gjsairsw001 implements QunarCrawler {
 	private static final NameValuePair AIR = new NameValuePair(
 			"_handler=itd.presentation.handler.request.air.PresAirSearchRequestHandler/_xpath=/sessionWorkflow/productWorkflow[@product='Air']",
 			"GO");
+
 	@Override
 	public BookingResult getBookingInfo(FlightSearchParam arg0) {
 		String bookingUrlPre = "https://airnamibia.sita.aero/itd/itd";
@@ -79,6 +80,7 @@ public class Wrapper_gjsairsw001 implements QunarCrawler {
 		map.put("/sessionWorkflow/productWorkflow[@product='Air']/travelSelection/journeySelection[1]/departLocation/selected","Airport."+arg0.getDep());
 		map.put("/sessionWorkflow/productWorkflow[@product='Air']/travelSelection/journeySelection[1]/arriveLocation/selected","Airport."+arg0.getArr());
 		map.put("Referer", "http://www.airnamibia.com.na/");
+		map.put("Host", "https://airnamibia.sita.aero");
 		bookingInfo.setContentType("UTF-8");
 		bookingInfo.setInputs(map);		
 		bookingResult.setData(bookingInfo);
