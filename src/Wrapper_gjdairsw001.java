@@ -18,8 +18,8 @@ import com.qunar.qfwrapper.bean.booking.BookingResult;
 import com.qunar.qfwrapper.bean.search.FlightDetail;
 import com.qunar.qfwrapper.bean.search.FlightSearchParam;
 import com.qunar.qfwrapper.bean.search.FlightSegement;
+import com.qunar.qfwrapper.bean.search.OneWayFlightInfo;
 import com.qunar.qfwrapper.bean.search.ProcessResultInfo;
-import com.qunar.qfwrapper.bean.search.RoundTripFlightInfo;
 import com.qunar.qfwrapper.constants.Constants;
 import com.qunar.qfwrapper.interfaces.QunarCrawler;
 import com.qunar.qfwrapper.util.QFHttpClient;
@@ -33,7 +33,7 @@ public class Wrapper_gjdairsw001 implements QunarCrawler {
 	
 	private static final NameValuePair TRIPTYPE = new NameValuePair(
 			"/sessionWorkflow/productWorkflow[@product='Air']/tripRequirements/tripType",
-			"Return");
+			"OneWay");
 	private static final NameValuePair ADULT = new NameValuePair(
 			"/sessionWorkflow/productWorkflow[@product='Air']/tripRequirements/allJourneyRequirements/numberOfTravellers[@key='Adult']",
 			"1");
@@ -50,30 +50,6 @@ public class Wrapper_gjdairsw001 implements QunarCrawler {
 			"_handler=itd.presentation.handler.request.air.PresAirSearchRequestHandler/_xpath=/sessionWorkflow/productWorkflow[@product='Air']",
 			"GO");
 	
-	public static void main(String[] args) {
-		FlightSearchParam searchParam = new FlightSearchParam();
-		searchParam.setDep("MLA");
-		searchParam.setArr("JNB");
-		searchParam.setDepDate("2014-09-16");
-		searchParam.setRetDate("2014-10-01");
-		searchParam.setTimeOut("60000");
-		searchParam.setToken("");
-		String html = new Wrapper_gjdairsw001().getHtml(searchParam);
-		ProcessResultInfo result = new ProcessResultInfo();
-		result = new  Wrapper_gjdairsw001().process(html,searchParam);
-		if(result.isRet() && result.getStatus().equals(Constants.SUCCESS))
-		{
-			List<RoundTripFlightInfo> flightList = (List<RoundTripFlightInfo>) result.getData();
-			for (RoundTripFlightInfo in : flightList){
-				System.out.println("************" + in.getInfo().toString());
-				System.out.println("++++++++++++" + in.getDetail().toString());
-			}
-		}
-		else
-		{
-			System.out.println(result.getStatus());
-		}
-	}
 
 	@Override
 	public BookingResult getBookingInfo(FlightSearchParam arg0) {
@@ -88,11 +64,8 @@ public class Wrapper_gjdairsw001 implements QunarCrawler {
 		String date1=arg0.getDepDate().replaceAll("-", "/");
 		Date date=new Date(date1);
 		date1=format.format(date);
-		String date2=arg0.getDepDate().replaceAll("-", "/");
-		date=new Date(date2);
-		date2=format.format(date);
 		map.put("requestor","itd.presentation.handler.page.air.PresAirSimpleReqsPageHandler");
-		map.put("_retdateeu",date2);
+		map.put("_retdateeu","");
 		map.put("/sessionWorkflow/productWorkflow[@product='Air']/tripRequirements/tripType","OneWay");
 		map.put("/sessionWorkflow/productWorkflow[@product='Air']/tripRequirements/allJourneyRequirements/numberOfTravellers[@key='Adult']","1");
 		map.put("/sessionWorkflow/productWorkflow[@product='Air']/tripRequirements/allJourneyRequirements/numberOfTravellers[@key='Child']","0");
@@ -122,16 +95,13 @@ public class Wrapper_gjdairsw001 implements QunarCrawler {
 			String date1=arg0.getDepDate().replaceAll("-", "/");
 			Date date=new Date(date1);
 			date1=format.format(date);
-			String date2=arg0.getRetDate().replaceAll("-", "/");
-			date=new Date(date2);
-			date2=format.format(date);
 			NameValuePair[] names = {
 					REQUESTOR,
 					new NameValuePair("_depdateeu", date1),
 					ADULT,
 					AIR,
 					new NameValuePair(
-							"_retdateeu", date2),
+							"_retdateeu", ""),
 					new NameValuePair(
 							"/sessionWorkflow/productWorkflow[@product='Air']/travelSelection/journeySelection[1]/departLocation/selected",
 							"Airport."+arg0.getDep()),
@@ -174,31 +144,20 @@ public class Wrapper_gjdairsw001 implements QunarCrawler {
 		{
 			moneyUnit="EUR";
 		}
-		List<RoundTripFlightInfo> flightList = new ArrayList<RoundTripFlightInfo>();
+		List<OneWayFlightInfo> flightList = new ArrayList<OneWayFlightInfo>();
 		try {	
 		if (html.indexOf("Flight and fare options")>0) {
-			
-			String [] htmls=html.split("Select a flight for your inbound journey");
-			String[] check=StringUtils.substringsBetween(htmls[0],"<!--","//-->");
+			String[] check=StringUtils.substringsBetween(html,"<!--","//-->");
 			List<String> list=new ArrayList<String>();
 			for (int i = 0; i < check.length; i++) {
 				if (check[i].indexOf("locD")>0&&check[i].indexOf("journeyNames[\"j\"+journey][journeyOption].seg")>0) {
 					list.add(check[i]);
 				}
 			}
-			String[] checkinfo=StringUtils.substringsBetween(htmls[1],"<!--","//-->");
-			List<String> listinfo=new ArrayList<String>();
-			for (int i = 0; i < checkinfo.length; i++) {
-				if (checkinfo[i].indexOf("locD")>0&&checkinfo[i].indexOf("journeyNames[\"j\"+journey][journeyOption].seg")>0) {
-					listinfo.add(checkinfo[i]);
-				}
-			}
 			FlightDetail flightDetail = new FlightDetail();
-			RoundTripFlightInfo flightinfo=new RoundTripFlightInfo();
+			OneWayFlightInfo flightinfo=new OneWayFlightInfo();
 			List<FlightSegement> segs = new ArrayList<FlightSegement>();
-			List<FlightSegement> segsinfo = new ArrayList<FlightSegement>();
 			List<String> flightNoList = new ArrayList<String>();
-			List<String> flightInfoNoList = new ArrayList<String>();
 			for (int i = 0; i < list.size(); i++) {
 				String flightString=list.get(i);
 				FlightSegement seg = new FlightSegement();
@@ -213,28 +172,11 @@ public class Wrapper_gjdairsw001 implements QunarCrawler {
 				seg.setArrDate(StringUtils.substringBetween(flightString,"arrivedayofweek = \"","\""));
 				segs.add(seg);
 			}
-			
-			for (int i = 0; i < listinfo.size(); i++) {
-				String flightString=listinfo.get(i);
-				FlightSegement seg = new FlightSegement();
-				seg.setDeptime(StringUtils.substringBetween(flightString,"departdatetime = \"","\""));
-				String flightNo= StringUtils.substringBetween(flightString,"flight = \"","\"").replaceAll("[^a-zA-Z\\d]", "");
-				flightInfoNoList.add(flightNo);
-				seg.setFlightno(flightNo);
-				seg.setDepairport(StringUtils.substringBetween(flightString,"locD = \"","\""));
-				seg.setArrtime(StringUtils.substringBetween(flightString,"arrivedatetime = \"","\""));
-				seg.setArrairport(StringUtils.substringBetween(flightString,"locA = \"","\""));
-				seg.setDepDate(StringUtils.substringBetween(flightString,"departdayofweek = \"","\""));
-				seg.setArrDate(StringUtils.substringBetween(flightString,"arrivedayofweek = \"","\""));
-				segsinfo.add(seg);
-			}
-			String priceStr=StringUtils.substringBetween(htmls[0],"<a title=\"Rules and Restrictions\"","</a>");
+			String priceStr=StringUtils.substringBetween(html,"<a title=\"Rules and Restrictions\"","</a>");
 			int pricescount=priceStr.indexOf(moneyUnit);
 			Double price=Double.parseDouble(priceStr.substring(pricescount).split(" ")[1]);
-			String priceStr1=StringUtils.substringBetween(htmls[1],"<a title=\"Rules and Restrictions\"","</a>");
-			int pricescount1=priceStr1.indexOf(moneyUnit);
-			Double price1=Double.parseDouble(priceStr1.substring(pricescount1).split(" ")[1]);
-			String taxStr=StringUtils.substringBetween(htmls[1],"Total price including taxes: ","(");
+
+			String taxStr=StringUtils.substringBetween(html,"Total price including taxes: ","(");
 			String tax=taxStr.split(" ")[1];
 			flightDetail.setArrcity(arg1.getArr());
 			flightDetail.setDepcity(arg1.getDep());
@@ -243,13 +185,11 @@ public class Wrapper_gjdairsw001 implements QunarCrawler {
 			flightDetail.setDepdate(date2);
 			flightDetail.setFlightno(flightNoList);
 			flightDetail.setMonetaryunit(moneyUnit);
-			flightDetail.setPrice(price+price1);
+			flightDetail.setPrice(price);
 			flightDetail.setTax(Double.parseDouble(tax));
 			flightDetail.setWrapperid("gjdairsw001");
 			flightinfo.setDetail(flightDetail);
-			flightinfo.setRetflightno(flightInfoNoList);
 			flightinfo.setInfo(segs);
-			flightinfo.setRetinfo(segsinfo);
 			flightList.add(flightinfo);
 		}
 		if (html.indexOf("Please correct the error below")>0) {
