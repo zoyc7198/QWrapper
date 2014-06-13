@@ -136,7 +136,6 @@ public class Wrapper_gjsairsw001 implements QunarCrawler {
 
 	@Override
 	public ProcessResultInfo process(String arg0, FlightSearchParam arg1) {
-		arg1.setIsFastTrack(true);
 		String html = arg0;
 		ProcessResultInfo result = new ProcessResultInfo();
 		if ("Exception".equals(html)) {
