@@ -51,35 +51,6 @@ public class Wrapper_gjsairsw001 implements QunarCrawler {
 	private static final NameValuePair AIR = new NameValuePair(
 			"_handler=itd.presentation.handler.request.air.PresAirSearchRequestHandler/_xpath=/sessionWorkflow/productWorkflow[@product='Air']",
 			"GO");
-	public static void main(String[] args) {
-
-		FlightSearchParam searchParam = new FlightSearchParam();
-		searchParam.setDep("AMS");
-		searchParam.setArr("JNB");
-		searchParam.setDepDate("2014-07-17");
-		searchParam.setRetDate("2014-07-31");
-		searchParam.setTimeOut("60000");
-		searchParam.setToken("");
-
-		String html = new  Wrapper_gjsairsw001().getHtml(searchParam);
-
-		ProcessResultInfo result = new ProcessResultInfo();
-		result = new  Wrapper_gjsairsw001().process(html,searchParam);
-		String jsonString = JSON.toJSONString(result);
-		System.out.println(jsonString);
-		if(result.isRet() && result.getStatus().equals(Constants.SUCCESS))
-		{
-//			List<OneWayFlightInfo> flightList = (List<OneWayFlightInfo>) result.getData();
-//			for (OneWayFlightInfo in : flightList){
-//				System.out.println("************" + in.getInfo().toString());
-//				System.out.println("++++++++++++" + in.getDetail().toString());
-//			}
-		}
-		else
-		{
-			System.out.println(result.getStatus());
-		}
-	}
 	@Override
 	public BookingResult getBookingInfo(FlightSearchParam arg0) {
 		String bookingUrlPre = "https://airnamibia.sita.aero/itd/itd";
