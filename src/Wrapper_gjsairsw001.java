@@ -50,31 +50,6 @@ public class Wrapper_gjsairsw001 implements QunarCrawler {
 			"_handler=itd.presentation.handler.request.air.PresAirSearchRequestHandler/_xpath=/sessionWorkflow/productWorkflow[@product='Air']",
 			"GO");
 	
-	public static void main(String[] args) {
-		FlightSearchParam searchParam = new FlightSearchParam();
-		searchParam.setDep("MLA");
-		searchParam.setArr("JNB");
-		searchParam.setDepDate("2014-09-16");
-		searchParam.setRetDate("2014-10-01");
-		searchParam.setTimeOut("60000");
-		searchParam.setToken("");
-		String html = new Wrapper_gjdairsw001().getHtml(searchParam);
-		ProcessResultInfo result = new ProcessResultInfo();
-		result = new  Wrapper_gjdairsw001().process(html,searchParam);
-		if(result.isRet() && result.getStatus().equals(Constants.SUCCESS))
-		{
-			List<RoundTripFlightInfo> flightList = (List<RoundTripFlightInfo>) result.getData();
-			for (RoundTripFlightInfo in : flightList){
-				System.out.println("************" + in.getInfo().toString());
-				System.out.println("++++++++++++" + in.getDetail().toString());
-			}
-		}
-		else
-		{
-			System.out.println(result.getStatus());
-		}
-	}
-
 	@Override
 	public BookingResult getBookingInfo(FlightSearchParam arg0) {
 		String bookingUrlPre = "https://airnamibia.sita.aero/itd/itd";
