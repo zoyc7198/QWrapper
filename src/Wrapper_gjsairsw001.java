@@ -245,7 +245,10 @@ public class Wrapper_gjsairsw001 implements QunarCrawler {
 			flightDetail.setFlightno(flightNoList);
 			flightDetail.setMonetaryunit(moneyUnit);
 			flightDetail.setPrice(price+price1);
-			flightDetail.setTax(Double.parseDouble(tax));
+			Double taxd=Double.parseDouble(tax);
+			BigDecimal ba=new BigDecimal(taxd);
+			BigDecimal bb=new BigDecimal(flightDetail.getPrice());
+			flightDetail.setTax(ba.subtract(bb,MathContext.DECIMAL32).doubleValue());
 			flightDetail.setWrapperid("gjsairsw001");
 			flightinfo.setDetail(flightDetail);
 			flightinfo.setRetflightno(flightInfoNoList);
