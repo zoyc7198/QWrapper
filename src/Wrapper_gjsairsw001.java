@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.math.BigDecimal;
 
 import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.httpclient.cookie.CookiePolicy;
